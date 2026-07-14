@@ -1,0 +1,1389 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preparação de Frota - Controle de Pátio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --frota-ink: #10233d;
+      --frota-muted: #637083;
+      --frota-line: #dce3ec;
+      --frota-blue: #1f5f99;
+      --frota-green: #177245;
+      --frota-bg: #f4f7fb;
+    }
+    body {
+      min-height: 100vh;
+      background:
+        linear-gradient(90deg, rgba(3, 19, 48, 0.18), rgba(3, 19, 48, 0.06)),
+        url("/images/login-sua-empresa.jpg") center top / cover fixed no-repeat,
+        var(--frota-bg);
+      color: var(--frota-ink);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .topbar {
+      background: rgba(255, 255, 255, 0.98);
+      border-bottom: 1px solid var(--frota-line);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      box-shadow: 0 4px 18px rgba(16, 35, 61, 0.08);
+    }
+    .module-shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .panel {
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid var(--frota-line);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(16, 35, 61, 0.06);
+      backdrop-filter: blur(2px);
+    }
+    .metric {
+      min-height: 112px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 22px;
+      border-radius: 14px;
+    }
+    .metric-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.45rem;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+    }
+    .metric-icon.fleet { background: linear-gradient(135deg, #7048f4 0%, #4633df 100%); }
+    .metric-icon.progress { background: linear-gradient(135deg, #1aa7f2 0%, #0868df 100%); }
+    .metric-icon.ready { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
+    .metric-icon.time { background: linear-gradient(135deg, #f59e0b 0%, #fb4b14 100%); }
+    .metric-icon.docs { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
+    .metric-icon.tires { background: linear-gradient(135deg, #111827 0%, #020617 100%); }
+    .metric-icon.tracker { background: linear-gradient(135deg, #14f1d9 0%, #2563eb 100%); }
+    .metric-icon.bodywork { background: linear-gradient(135deg, #b91c1c 0%, #f59e0b 100%); }
+    .metric-guide {
+      position: relative;
+      width: 100%;
+      border: 1px solid var(--frota-line);
+      text-align: left;
+      color: inherit;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .metric-guide:hover,
+    .metric-guide.active {
+      transform: translateY(-1px);
+      border-color: rgba(31, 95, 153, 0.48);
+      box-shadow: 0 14px 28px rgba(16, 35, 61, 0.12);
+    }
+    .metric-guide.active {
+      background: #eff6ff;
+      border-color: #0d6efd;
+      outline: 3px solid rgba(13, 110, 253, 0.18);
+    }
+    .metric-guide.active::before,
+    .purpose-filter-card.active::before {
+      content: "ATIVO";
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #0d6efd;
+      color: #ffffff;
+      font-size: 0.66rem;
+      font-weight: 900;
+      letter-spacing: 0;
+      box-shadow: 0 6px 14px rgba(13, 110, 253, 0.24);
+    }
+    .metric-guide.has-signal {
+      box-shadow: 0 10px 28px rgba(16, 35, 61, 0.08), 0 0 0 2px rgba(250, 204, 21, 0.28), 0 0 22px rgba(250, 204, 21, 0.32);
+    }
+    .metric-guide.has-signal::after {
+      content: "";
+      position: absolute;
+      top: auto;
+      bottom: 14px;
+      right: 14px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #facc15;
+      box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.18), 0 0 18px rgba(250, 204, 21, 0.75);
+    }
+    .metric strong {
+      display: block;
+      font-size: 1.95rem;
+      line-height: 1;
+      color: #061326;
+    }
+    .metric span {
+      color: var(--frota-muted);
+      font-size: 0.9rem;
+    }
+    .metric small {
+      display: block;
+      color: #475569;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+    .purpose-filter-card {
+      position: relative;
+      min-height: 88px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 12px;
+      text-align: left;
+      color: #10233d;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .purpose-filter-card:hover,
+    .purpose-filter-card.active {
+      transform: translateY(-1px);
+      border-color: rgba(31, 95, 153, 0.48);
+      box-shadow: 0 14px 28px rgba(16, 35, 61, 0.12);
+    }
+    .purpose-filter-card.active {
+      background: #eff6ff;
+      border-color: #0d6efd;
+      outline: 3px solid rgba(13, 110, 253, 0.18);
+    }
+    .purpose-filter-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1px solid #facc15;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.16);
+      overflow: hidden;
+    }
+    .purpose-filter-icon img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      display: block;
+    }
+    .purpose-filter-card strong {
+      display: block;
+      font-size: 1.35rem;
+      line-height: 1;
+      color: #061326;
+    }
+    .purpose-filter-card span {
+      display: block;
+      color: var(--frota-muted);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .purpose-filter-card .purpose-filter-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .purpose-filter-card .purpose-filter-icon img {
+      flex: 0 0 auto;
+    }
+    body.is-prep-limited [data-admin-prep-action],
+    body.is-prep-limited [data-admin-prep-field] {
+      display: none !important;
+    }
+    body.is-prep-limited .prep-card-actions {
+      grid-template-columns: 1fr auto;
+    }
+    body.is-prep-readonly .prep-card-actions {
+      grid-template-columns: 1fr;
+    }
+    #frotaEditModal .modal-dialog {
+      max-height: calc(100vh - 1rem);
+    }
+    #frotaEditModal .modal-content {
+      max-height: calc(100vh - 1rem);
+    }
+    #frotaEditModal .modal-body {
+      overflow-y: auto;
+      padding-bottom: 96px;
+    }
+    #frotaEditModal .modal-footer {
+      position: sticky;
+      bottom: 0;
+      background: #ffffff;
+      z-index: 2;
+    }
+    .updates-panel {
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .updates-title {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--frota-line);
+      font-weight: 900;
+      color: #10233d;
+    }
+    .updates-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 18px 20px;
+    }
+    .update-card {
+      background: #f8fafc;
+      border: 1px solid #e4ebf3;
+      border-radius: 10px;
+      padding: 12px 14px;
+      min-height: 74px;
+      color: #25364d;
+    }
+    .update-card strong {
+      color: #4d3df3;
+    }
+    .update-card p {
+      margin: 0;
+      font-weight: 800;
+      font-size: 0.87rem;
+      line-height: 1.25;
+    }
+    .update-card small {
+      color: #64748b;
+      font-weight: 700;
+    }
+    .vehicle-card-grid {
+      --frota-grid-columns: 1;
+      display: grid;
+      grid-template-columns: repeat(var(--frota-grid-columns), minmax(0, 1fr));
+      gap: clamp(8px, 1vw, 16px);
+      padding: 16px;
+    }
+    .prep-vehicle-card {
+      border: 1px solid var(--frota-line);
+      border-radius: 14px;
+      background: #ffffff;
+      box-shadow: 0 10px 22px rgba(16, 35, 61, 0.08);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .prep-vehicle-card:hover,
+    .prep-vehicle-card.active {
+      transform: translateY(-2px);
+      border-color: rgba(31, 95, 153, 0.45);
+      box-shadow: 0 16px 34px rgba(16, 35, 61, 0.14);
+    }
+    .prep-conjunto-card .prep-card-hero {
+      min-height: 174px;
+    }
+    .prep-conjunto-title {
+      position: absolute;
+      z-index: 7;
+      top: 52px;
+      left: 12px;
+      padding: 5px 9px;
+      border: 1px solid rgba(255,255,255,0.34);
+      border-radius: 7px;
+      background: rgba(255,255,255,0.18);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 950;
+      letter-spacing: 0.02em;
+    }
+    .prep-conjunto-plates {
+      position: absolute;
+      z-index: 8;
+      left: 12px;
+      bottom: 10px;
+      display: grid;
+      gap: 5px;
+    }
+    .prep-conjunto-plates > div {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .prep-conjunto-plates small {
+      width: 42px;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.55rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .prep-card-hero .prep-conjunto-plates .placa-container {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      min-width: 102px;
+    }
+    .prep-conjunto-thumb {
+      position: absolute;
+      z-index: 4;
+      right: -4px;
+      bottom: -5px;
+      width: 180px;
+      height: 128px;
+      object-fit: contain;
+      object-position: bottom right;
+      filter: drop-shadow(0 12px 12px rgba(11, 23, 43, 0.28));
+      pointer-events: none;
+    }
+    .prep-conjunto-actions {
+      grid-template-columns: 1fr auto;
+    }
+    .conjunto-view-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 12px 16px 0;
+      padding: 11px 13px;
+      border: 1px solid #a9efc4;
+      border-radius: 10px;
+      background: #effcf4;
+      color: #166534;
+    }
+    .conjunto-view-bar[hidden] { display: none; }
+    .conjunto-view-bar small {
+      display: block;
+      margin-top: 2px;
+      color: #477158;
+      font-weight: 700;
+    }
+    .prep-card-hero {
+      min-height: 148px;
+      padding: 12px;
+      background: linear-gradient(135deg, #4d3df3 0%, #0a8ee8 100%);
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+    }
+    .prep-vehicle-card.ready .prep-card-hero {
+      background: linear-gradient(135deg, #16823e 0%, #1db85b 100%);
+    }
+    .prep-card-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 6;
+    }
+    .prep-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #10233d;
+      font-weight: 800;
+      font-size: 0.78rem;
+      line-height: 1;
+    }
+    .prep-pill.status {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #ffffff;
+    }
+    .prep-pill.delivery-signal {
+      background: #ecfdf5;
+      border-color: #86efac;
+      color: #047857;
+      box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.2), 0 0 18px rgba(74, 222, 128, 0.9);
+      animation: deliveredGlow 1.15s ease-in-out infinite;
+    }
+    .prep-pill.delivery-signal .bi-circle-fill {
+      color: #22c55e;
+      font-size: 0.58rem;
+      filter: drop-shadow(0 0 4px #4ade80);
+      animation: deliveredDot 1.15s ease-in-out infinite;
+    }
+    @keyframes deliveredGlow {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.18), 0 0 10px rgba(74, 222, 128, 0.58); }
+      50% { box-shadow: 0 0 0 4px rgba(134, 239, 172, 0.34), 0 0 24px rgba(74, 222, 128, 1); }
+    }
+    @keyframes deliveredDot {
+      0%, 100% { opacity: 0.42; transform: scale(0.78); }
+      50% { opacity: 1; transform: scale(1.18); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .prep-pill.delivery-signal,
+      .prep-pill.delivery-signal .bi-circle-fill { animation: none; }
+    }
+    .prep-pill.late {
+      color: #b91c1c;
+      background: #ffe4e6;
+    }
+    .prep-card-main {
+      position: static;
+      z-index: 5;
+      margin-top: 0;
+    }
+    .prep-fleet-number {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      position: absolute;
+      left: 12px;
+      top: 58px;
+      max-width: 168px;
+      min-height: 25px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.20);
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      font-weight: 900;
+      font-size: 0.75rem;
+      line-height: 1;
+      margin-bottom: 0;
+      text-shadow: 0 1px 1px rgba(15, 23, 42, 0.16);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      z-index: 6;
+    }
+    .prep-card-truck {
+      display: none;
+    }
+    .prep-vehicle-thumb {
+      position: absolute;
+      right: -6px;
+      bottom: -8px;
+      width: 132px;
+      height: 98px;
+      object-fit: contain;
+      object-position: bottom right;
+      z-index: 4;
+      filter: drop-shadow(0 12px 12px rgba(11, 23, 43, 0.26));
+      pointer-events: none;
+    }
+    .prep-vehicle-thumb.trailer {
+      right: -10px;
+      bottom: -3px;
+      width: 142px;
+      height: 92px;
+    }
+    .frota-model-preview {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 72px;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border: 1px solid #d8e1ec;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f8fbff, #eef5ff);
+      color: #53657d;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+    .frota-model-preview[hidden] {
+      display: none;
+    }
+    .frota-model-preview img {
+      width: 96px;
+      height: 58px;
+      object-fit: contain;
+      filter: drop-shadow(0 7px 7px rgba(11, 23, 43, 0.18));
+    }
+    .prep-card-body {
+      padding: 14px 16px 16px;
+    }
+    .prep-stage-summary {
+      border: 1px solid #d8e1ec;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 9px 10px;
+      margin-bottom: 11px;
+    }
+    .prep-stage-summary small {
+      display: block;
+      color: #53657d;
+      font-weight: 800;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+    }
+    .prep-stage-summary strong {
+      display: block;
+      color: #10233d;
+      font-size: 0.82rem;
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+    .prep-meta-row {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.82rem;
+      margin-bottom: 9px;
+    }
+    .prep-meta-row span {
+      color: #53657d;
+    }
+    .prep-meta-row strong {
+      color: #020617;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-align: right;
+      font-size: 0.78rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .prep-progress-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      margin: 12px 0 14px;
+    }
+    .prep-progress-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #e8edf3;
+      overflow: hidden;
+    }
+    .prep-progress-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #4d3df3, #08a8df);
+    }
+    .prep-vehicle-card.ready .prep-progress-fill {
+      background: #18a957;
+    }
+    .prep-progress-value {
+      font-weight: 900;
+      color: #020617;
+      font-size: 0.86rem;
+    }
+    .prep-area-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    .prep-area-chip {
+      border-radius: 7px;
+      padding: 5px 8px;
+      font-weight: 800;
+      font-size: 0.75rem;
+      border: 1px solid transparent;
+    }
+    .prep-area-chip.done { color: #167342; background: #d9fbe6; border-color: #a9efc4; }
+    .prep-area-chip.progress { color: #a16207; background: #fef3c7; border-color: #fde68a; }
+    .prep-area-chip.pending { color: #b91c1c; background: #fee2e2; border-color: #fecaca; }
+    .prep-open-button {
+      width: 100%;
+      border: 1px solid #d8e1ec;
+      background: #f8fafc;
+      color: #4d3df3;
+      border-radius: 9px;
+      padding: 9px 12px;
+      font-weight: 900;
+    }
+    .prep-card-actions {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .prep-icon-action {
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9px;
+      border: 1px solid #d8e1ec;
+      background: #ffffff;
+      color: #334155;
+    }
+    .prep-icon-action.danger {
+      color: #b91c1c;
+      border-color: #fecaca;
+      background: #fff7f7;
+    }
+    .placa-container {
+      display: inline-block;
+      min-width: 106px;
+      padding: 0;
+      border-radius: 8px;
+      font-weight: 700;
+      font-family: Arial, sans-serif;
+      font-size: 0.9rem;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .prep-card-hero .placa-container {
+      position: absolute;
+      left: 12px;
+      bottom: 17px;
+      z-index: 7;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+    }
+    .placa-vermelha {
+      background: linear-gradient(135deg, #c41e3a 0%, #8b0000 100%);
+      color: white;
+      border: 2px solid #8b0000;
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 76px;
+      min-height: 30px;
+      text-align: center;
+    }
+    .placa-mercosul {
+      background: linear-gradient(180deg, #ffffff 0%, #fcfcfc 100%);
+      border: 2px solid #b30f14;
+      position: relative;
+      overflow: hidden;
+      padding-top: 13px;
+      min-width: 106px;
+      min-height: 29px;
+      border-radius: 7px;
+    }
+    .placa-mercosul::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 13px;
+      background: linear-gradient(135deg, #0b46a8 0%, #123d8f 100%);
+      border-bottom: 1px solid #b30f14;
+      z-index: 0;
+    }
+    .placa-mercosul .placa-texto {
+      position: relative;
+      z-index: 1;
+      color: #b30f14;
+      letter-spacing: 1.6px;
+      text-shadow: 0 0 1px rgba(0,0,0,0.2);
+      display: block;
+      padding: 4px 8px 3px;
+      font-size: 0.84rem;
+      line-height: 1;
+      text-align: center;
+    }
+    .placa-mercosul::after {
+      content: "BRASIL";
+      position: absolute;
+      top: 1px;
+      left: 0;
+      right: 0;
+      font-size: 0.43rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-align: center;
+      color: #fff;
+      z-index: 2;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    }
+    .vehicle-card-grid.dense .prep-card-hero {
+      min-height: 148px;
+      padding: 12px;
+    }
+    .vehicle-card-grid.dense .prep-conjunto-card .prep-card-hero {
+      min-height: 174px;
+    }
+    .vehicle-card-grid.dense .prep-conjunto-thumb {
+      width: 154px;
+      height: 116px;
+    }
+    .vehicle-card-grid.dense .prep-card-topline {
+      gap: 6px;
+    }
+    .vehicle-card-grid.dense .prep-pill {
+      padding: 5px 7px;
+      font-size: 0.7rem;
+    }
+    .vehicle-card-grid.dense .prep-card-main {
+      margin-top: 0;
+    }
+    .vehicle-card-grid.dense .prep-fleet-number {
+      max-width: 168px;
+      padding: 6px 10px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .vehicle-card-grid.dense .prep-card-truck {
+      display: none;
+    }
+    .vehicle-card-grid.dense .prep-vehicle-thumb {
+      width: 132px;
+      height: 98px;
+      right: -6px;
+      bottom: -8px;
+    }
+    .vehicle-card-grid.dense .prep-vehicle-thumb.trailer {
+      width: 142px;
+      height: 92px;
+      right: -10px;
+      bottom: -3px;
+    }
+    .vehicle-card-grid.dense .prep-card-body {
+      padding: 12px;
+    }
+    .vehicle-card-grid.dense .prep-meta-row {
+      grid-template-columns: 54px minmax(0, 1fr);
+      gap: 5px;
+      font-size: 0.72rem;
+      margin-bottom: 7px;
+    }
+    .vehicle-card-grid.dense .prep-meta-row strong {
+      font-size: 0.68rem;
+    }
+    .vehicle-card-grid.dense .prep-progress-row {
+      gap: 8px;
+      margin: 10px 0 12px;
+    }
+    .vehicle-card-grid.dense .prep-area-chips {
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+    .vehicle-card-grid.dense .prep-area-chip {
+      padding: 4px 6px;
+      font-size: 0.66rem;
+    }
+    .vehicle-card-grid.dense .prep-card-actions {
+      gap: 6px;
+    }
+    .vehicle-card-grid.dense .prep-open-button {
+      padding: 8px 6px;
+      font-size: 0.76rem;
+    }
+    .vehicle-card-grid.dense .prep-icon-action {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+    }
+    .vehicle-card-grid.ultra-dense .prep-card-hero {
+      min-height: 148px;
+    }
+    .vehicle-card-grid.ultra-dense .prep-card-topline {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .vehicle-card-grid.ultra-dense .prep-card-truck {
+      display: none;
+    }
+    .vehicle-card-grid.ultra-dense .prep-vehicle-thumb {
+      display: block;
+    }
+    .vehicle-card-grid.ultra-dense .prep-card-actions {
+      grid-template-columns: 1fr 30px 30px;
+      gap: 4px;
+    }
+    .vehicle-card-grid.ultra-dense .prep-open-button {
+      font-size: 0;
+    }
+    .vehicle-card-grid.ultra-dense .prep-open-button::after {
+      content: "Abrir";
+      font-size: 0.7rem;
+    }
+    .vehicle-card-grid.ultra-dense .prep-icon-action {
+      width: 30px;
+      height: 30px;
+    }
+    .vehicle-card-grid.ultra-dense .placa-container {
+      min-width: 92px;
+      font-size: 0.76rem;
+    }
+    .vehicle-card-grid.ultra-dense .placa-mercosul {
+      min-width: 92px;
+    }
+    .vehicle-card-grid.ultra-dense .placa-mercosul .placa-texto {
+      padding-left: 5px;
+      padding-right: 5px;
+      font-size: 0.72rem;
+      letter-spacing: 0.7px;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      background: #d97706;
+    }
+    .status-dot.pronto {
+      background: var(--frota-green);
+    }
+    .area-block + .area-block {
+      border-top: 1px solid var(--frota-line);
+    }
+    .area-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #f8fafc;
+    }
+    .check-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 9px;
+      align-items: start;
+      padding: 12px 16px;
+      border-top: 1px solid #eef2f7;
+    }
+    .check-row:first-child {
+      border-top: 0;
+    }
+    .check-item-title strong {
+      color: #10233d;
+      display: block;
+      font-size: 0.92rem;
+      text-transform: uppercase;
+    }
+    .check-item-title small {
+      color: #64748b;
+      display: block;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .check-item-controls {
+      display: grid;
+      grid-template-columns: auto auto minmax(180px, 260px) auto;
+      gap: 14px;
+      align-items: center;
+    }
+    .edit-checklist {
+      border: 1px solid var(--frota-line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+    #frotaEditModal .edit-checklist {
+      max-height: min(48dvh, 430px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .edit-checklist-area + .edit-checklist-area {
+      border-top: 1px solid var(--frota-line);
+    }
+    .edit-checklist-area-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #f8fafc;
+      font-weight: 900;
+    }
+    .edit-checklist-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 9px;
+      align-items: start;
+      padding: 10px 14px;
+      border-top: 1px solid #eef2f7;
+    }
+    .checklist-window-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .checklist-window-card {
+      border: 1px solid #e3eaf2;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 10px 12px;
+      min-width: 0;
+    }
+    .checklist-window-card small {
+      display: block;
+      color: #64748b;
+      font-weight: 800;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+    .checklist-window-card strong {
+      display: block;
+      color: #0f172a;
+      font-size: 0.88rem;
+      overflow-wrap: anywhere;
+    }
+    .empty-state {
+      color: var(--frota-muted);
+      text-align: center;
+      padding: 40px 20px;
+    }
+    #frotaEditModal .modal-dialog {
+      height: calc(100vh - 24px);
+      height: calc(100dvh - 24px);
+      max-height: calc(100vh - 24px);
+      max-height: calc(100dvh - 24px);
+      margin-top: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: stretch;
+    }
+    #frotaEditModal .modal-content {
+      height: calc(100vh - 24px) !important;
+      height: calc(100dvh - 24px) !important;
+      max-height: calc(100vh - 24px) !important;
+      max-height: calc(100dvh - 24px) !important;
+      overflow: hidden !important;
+    }
+    #frotaEditForm {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      height: 100%;
+      min-height: 0;
+    }
+    #frotaEditModal .modal-header,
+    #frotaEditModal .modal-footer {
+      background: #ffffff;
+      z-index: 2;
+    }
+    #frotaEditModal .modal-footer {
+      position: sticky;
+      bottom: 0;
+      border-top: 1px solid var(--frota-line);
+    }
+    #frotaEditModal .modal-body {
+      min-height: 0 !important;
+      max-height: none !important;
+      overflow-y: auto !important;
+      overscroll-behavior: contain;
+      padding-bottom: 96px;
+    }
+    #frotaEditModal .edit-checklist::after {
+      content: "";
+      display: block;
+      height: 18px;
+    }
+    .form-control, .form-select, .btn {
+      border-radius: 6px;
+    }
+    @media (max-width: 900px) {
+      .vehicle-card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      }
+      .updates-grid {
+        grid-template-columns: 1fr;
+      }
+      .check-row {
+        grid-template-columns: 1fr;
+      }
+      .check-item-controls,
+      .edit-checklist-row {
+        grid-template-columns: 1fr;
+      }
+      .checklist-window-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .module-shell {
+        padding: 12px;
+      }
+      body {
+        background-position: 38% top;
+        background-attachment: scroll;
+      }
+    }
+    @media (max-width: 640px) {
+      .vehicle-card-grid {
+        grid-template-columns: 1fr;
+      }
+      .conjunto-view-bar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .checklist-window-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="module-shell py-3 d-flex align-items-center justify-content-between gap-3">
+      <div>
+        <h1 class="h4 mb-0"><i class="bi bi-clipboard2-check me-2"></i>Preparação de Frota</h1>
+        <div class="text-muted small">Módulo vinculado ao Controle de Pátio pela placa ou chassi do veículo</div>
+      </div>
+      <div class="d-flex gap-2">
+        <span class="badge text-bg-light border d-inline-flex align-items-center px-3" id="frotaUserLabel">Usuário</span>
+        <button class="btn btn-outline-success" id="btnBackupFrota" data-admin-prep-action title="Fazer backup da preparacao"><i class="bi bi-download"></i></button>
+        <button class="btn btn-outline-warning" id="btnRestoreFrota" data-admin-prep-action title="Restaurar backup da preparacao"><i class="bi bi-upload"></i></button>
+        <button class="btn btn-outline-secondary" id="btnBackToPatio" data-admin-prep-action title="Voltar ao pátio"><i class="bi bi-arrow-left"></i></button>
+        <button class="btn btn-outline-primary" id="btnRefreshFrota" title="Atualizar"><i class="bi bi-arrow-clockwise"></i></button>
+        <button class="btn btn-outline-danger" id="btnLogoutFrota" title="Sair"><i class="bi bi-box-arrow-right"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="module-shell">
+    <section class="row g-3 mb-3">
+      <div class="col-md-6 col-xl-3">
+        <div class="panel metric">
+          <div class="metric-icon fleet"><i class="bi bi-truck-front-fill"></i></div>
+          <div><strong id="metricTotal">0</strong><span>Veículos na frota</span></div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <button type="button" class="panel metric metric-guide" data-status-filter="preparacao" aria-pressed="false">
+          <div class="metric-icon progress"><i class="bi bi-tools"></i></div>
+          <div><strong id="metricOpen">0</strong><span>Em preparação</span></div>
+        </button>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <button type="button" class="panel metric metric-guide" data-status-filter="pronto" aria-pressed="false">
+          <div class="metric-icon ready"><i class="bi bi-check-square-fill"></i></div>
+          <div><strong id="metricReady">0</strong><span>Prontos para operar</span></div>
+        </button>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <div class="panel metric">
+          <div class="metric-icon time"><i class="bi bi-hourglass-split"></i></div>
+          <div><strong id="metricOldestDays">0 dias</strong><span>Há mais tempo em preparo</span><small id="metricOldestPlate">-</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="row g-3 mb-3" aria-label="Guias visuais de pendências">
+      <div class="col-md-6 col-xl-3">
+        <button type="button" class="panel metric metric-guide" data-guide-filter="documentos">
+          <div class="metric-icon docs"><i class="bi bi-file-earmark-text-fill"></i></div>
+          <div><strong id="metricPendingDocs">0</strong><span>Documentos pendentes</span></div>
+        </button>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <button type="button" class="panel metric metric-guide" data-guide-filter="pneus">
+          <div class="metric-icon tires"><i class="bi bi-life-preserver"></i></div>
+          <div><strong id="metricPendingTires">0</strong><span>Pendente de Pneus</span></div>
+        </button>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <button type="button" class="panel metric metric-guide" data-guide-filter="rastreador">
+          <div class="metric-icon tracker"><i class="bi bi-broadcast-pin"></i></div>
+          <div><strong id="metricPendingTracker">0</strong><span>Rastreador para instalar</span></div>
+        </button>
+      </div>
+      <div class="col-md-6 col-xl-3">
+        <button type="button" class="panel metric metric-guide" data-guide-filter="bau-plataforma">
+          <div class="metric-icon bodywork"><i class="bi bi-truck"></i></div>
+          <div><strong id="metricPendingBodywork">0</strong><span>Pendente Baú / plataforma</span></div>
+        </button>
+      </div>
+    </section>
+
+    <section class="row g-3 mb-3" aria-label="Filtros por operação">
+      <div class="col-md-6">
+        <button type="button" class="panel purpose-filter-card w-100" data-purpose-filter="diversos">
+          <span class="purpose-filter-icon diversos"><img src="images/icons/diversos.png" alt="Diversos"></span>
+          <span>
+            <strong id="metricDiversos">0</strong>
+            <span>Diversos</span>
+          </span>
+        </button>
+      </div>
+      <div class="col-md-6">
+        <button type="button" class="panel purpose-filter-card w-100" data-purpose-filter="correios">
+          <span class="purpose-filter-icon correios"><img src="images/icons/correios.png" alt="Correios"></span>
+          <span>
+            <strong id="metricCorreios">0</strong>
+            <span>Correios</span>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <section class="panel updates-panel mb-3">
+      <div class="updates-title"><i class="bi bi-bell-fill text-warning me-2"></i>Últimas atualizações</div>
+      <div class="updates-grid" id="frotaUpdatesGrid"></div>
+    </section>
+
+    <section class="panel p-3 mb-3" data-admin-prep-action>
+      <form id="frotaVehicleForm" class="row g-3 align-items-end">
+        <div class="col-md-2">
+          <label class="form-label" for="frotaPlate">Placa</label>
+          <input class="form-control text-uppercase" id="frotaPlate" maxlength="10" autocomplete="off" placeholder="Opcional">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" for="frotaFleetNumber">Frota</label>
+          <input class="form-control" id="frotaFleetNumber" autocomplete="off">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" for="frotaVehicleType">Tipo</label>
+          <input class="form-control" id="frotaVehicleType" autocomplete="off" placeholder="Ex.: Truck, Carreta">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" for="frotaModel">Modelo</label>
+          <input class="form-control" id="frotaModel" autocomplete="off" placeholder="Preenchido pela placa ou chassi">
+          <div class="frota-model-preview" id="frotaModelPreview" hidden aria-live="polite"></div>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" for="frotaChassis">Chassi</label>
+          <input class="form-control" id="frotaChassis" autocomplete="off">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" for="frotaRenavam">RENAVAM</label>
+          <input class="form-control" id="frotaRenavam" autocomplete="off">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" for="frotaInvoiceNumber">Frota - Documentação: nº da nota fiscal</label>
+          <input class="form-control" id="frotaInvoiceNumber" autocomplete="off">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label" for="frotaPurpose">Operação</label>
+          <select class="form-select" id="frotaPurpose">
+            <option value="">Padrão</option>
+            <option value="diversos">Diversos</option>
+            <option value="correios">Correios</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+          <button type="button" class="btn btn-outline-primary flex-fill" id="btnLookupPlate"><i class="bi bi-search"></i></button>
+          <button class="btn btn-primary flex-fill" type="submit"><i class="bi bi-plus-lg me-1"></i>Incluir</button>
+        </div>
+        <div class="col-12">
+          <textarea class="form-control" id="frotaNotes" rows="2" placeholder="Observações"></textarea>
+          <div class="form-text" id="lookupHint"></div>
+        </div>
+      </form>
+    </section>
+
+    <section class="row g-3">
+      <div class="col-12">
+        <div class="panel">
+          <div class="p-3 border-bottom d-flex align-items-center gap-2 flex-wrap">
+            <input class="form-control flex-grow-1" id="frotaSearch" style="min-width: 240px" placeholder="Buscar por placa, tipo, modelo, RENAVAM, chassi ou pátio">
+            <button type="button" class="btn btn-success" id="btnMountFrotaConjunto" data-admin-prep-action>
+              <i class="bi bi-link-45deg me-1"></i>Montar conjunto
+            </button>
+          </div>
+          <div class="conjunto-view-bar" id="frotaConjuntoViewBar" hidden></div>
+          <div class="vehicle-card-grid" id="frotaVehiclesTable"></div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="panel" id="frotaDetails">
+          <div class="empty-state">
+            <i class="bi bi-clipboard2-check fs-1 d-block mb-2"></i>
+            Selecione um veículo para acompanhar a preparação.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal fade" id="frotaEditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <form id="frotaEditForm">
+          <div class="modal-header">
+            <h2 class="modal-title h5" id="frotaEditTitle">Editar veículo</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="frotaEditId">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label" for="frotaEditPlate">Placa</label>
+                <input class="form-control text-uppercase" id="frotaEditPlate" maxlength="10" autocomplete="off" placeholder="Opcional">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="frotaEditFleetNumber">Frota</label>
+                <input class="form-control" id="frotaEditFleetNumber" autocomplete="off">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="frotaEditVehicleType">Tipo</label>
+                <input class="form-control" id="frotaEditVehicleType" autocomplete="off">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" for="frotaEditModel">Modelo</label>
+                <input class="form-control" id="frotaEditModel" autocomplete="off">
+                <div class="frota-model-preview" id="frotaEditModelPreview" hidden aria-live="polite"></div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="frotaEditChassis">Chassi</label>
+                <input class="form-control" id="frotaEditChassis" autocomplete="off">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="frotaEditRenavam">RENAVAM</label>
+                <input class="form-control" id="frotaEditRenavam" autocomplete="off">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="frotaEditInvoiceNumber">Frota - Documentação: nº da nota fiscal</label>
+                <input class="form-control" id="frotaEditInvoiceNumber" autocomplete="off">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="frotaEditPurchaseDate">Data de compra</label>
+                <input class="form-control" id="frotaEditPurchaseDate" type="date">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="frotaEditPurpose">Operação</label>
+                <select class="form-select" id="frotaEditPurpose">
+                  <option value="">Padrão</option>
+                  <option value="diversos">Diversos</option>
+                  <option value="correios">Correios</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="frotaEditNotes">Observações</label>
+                <textarea class="form-control" id="frotaEditNotes" rows="3"></textarea>
+              </div>
+              <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                  <h3 class="h6 mb-0"><i class="bi bi-list-check me-1"></i>Checklist completo</h3>
+                  <small class="text-muted" id="frotaEditChecklistHint">Todos os campos podem ser atualizados aqui.</small>
+                </div>
+                <div class="edit-checklist" id="frotaEditChecklist"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check2 me-1"></i>Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="frotaChecklistModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="frotaChecklistTitle">Checklist do veiculo</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body" id="frotaChecklistWindow">
+          <div class="empty-state py-3">Selecione um veiculo para abrir o checklist.</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary frota-modal-edit-vehicle"><i class="bi bi-pencil me-1"></i>Editar veiculo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="frotaLookupModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="frotaLookupTitle">Veículo encontrado</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body" id="frotaLookupBody">
+          <div class="empty-state py-3">Informe uma placa para consultar o veículo.</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="frotaConjuntoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <form id="frotaConjuntoForm">
+          <div class="modal-header">
+            <div>
+              <h2 class="modal-title h5 mb-1"><i class="bi bi-link-45deg me-1"></i>Montar conjunto</h2>
+              <div class="small text-muted">Associe um cavalo e uma carreta prontos para operar.</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="frotaConjuntoCavalo">Cavalo mecânico</label>
+                <select class="form-select" id="frotaConjuntoCavalo" required></select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="frotaConjuntoCarreta">Carreta</label>
+                <select class="form-select" id="frotaConjuntoCarreta" required></select>
+              </div>
+              <div class="col-12">
+                <div class="alert alert-light border mb-0" id="frotaConjuntoHint"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-success" id="btnSaveFrotaConjunto"><i class="bi bi-link-45deg me-1"></i>Montar conjunto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="frotaEntregaConjuntoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form id="frotaEntregaConjuntoForm">
+          <div class="modal-header">
+            <div>
+              <h2 class="modal-title h5 mb-1" id="frotaEntregaConjuntoTitle"><i class="bi bi-box-arrow-right me-1"></i>Entregar conjunto</h2>
+              <div class="small text-muted" id="frotaEntregaConjuntoLabel"></div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="frotaEntregaTipo">
+            <input type="hidden" id="frotaEntregaAlvoId">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="frotaEntregaData">Data e hora da entrega</label>
+                <input type="datetime-local" class="form-control" id="frotaEntregaData" step="60" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold" for="frotaEntregaOperacao">Operação</label>
+                <select class="form-select" id="frotaEntregaOperacao" required>
+                  <option value="">Selecione</option>
+                  <option value="correios">Correios</option>
+                  <option value="diversos">Diversos</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold" for="frotaEntregaRecebedor">Quem recebeu</label>
+                <input type="text" class="form-control" id="frotaEntregaRecebedor" maxlength="160" required placeholder="Nome do responsável pelo recebimento">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold" for="frotaEntregaObservacao">Observação</label>
+                <textarea class="form-control" id="frotaEntregaObservacao" rows="3" maxlength="500" placeholder="Informações adicionais da entrega"></textarea>
+              </div>
+              <div class="col-12">
+                <div class="alert alert-info mb-0" id="frotaEntregaAviso">A entrega será registrada também no cavalo e na carreta deste conjunto.</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btnSaveFrotaEntrega"><i class="bi bi-check2-circle me-1"></i>Confirmar entrega</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="frotaRestoreInput" accept="application/json,.json" hidden>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/frota.js?v=20260713-entrega-individual"></script>
+</body>
+</html>

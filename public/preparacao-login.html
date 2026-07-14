@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#031536">
+  <title>Veículos em Preparação - Sua Empresa</title>
+  <link rel="icon" href="/images/logo-sua-empresa.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root { color-scheme: light; --navy: #061d4d; --muted: #7486a9; }
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; margin: 0; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #071b48; background: #020d27 url("/images/login-sua-empresa.jpg") center / cover no-repeat fixed; }
+    .login-shell { min-height: 100vh; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(390px, .65fr); align-items: center; gap: clamp(32px, 5vw, 88px); padding: clamp(30px, 4vw, 72px) clamp(28px, 7vw, 120px); background: linear-gradient(90deg, rgba(1,10,31,.08), rgba(1,10,31,.03) 58%, rgba(1,10,31,.22)); }
+    .brand-stage { align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; min-height: 76vh; }
+    .brand-logo { width: min(430px, 48vw); align-self: center; margin-top: 1vh; filter: drop-shadow(0 18px 35px rgba(0,0,0,.32)); }
+    .brand-note { display: flex; align-items: center; gap: 16px; color: white; text-shadow: 0 2px 8px rgba(0,0,0,.55); }
+    .brand-note i { color: #12b9ff; font-size: 2.7rem; padding-right: 16px; border-right: 3px solid #ff9d00; }
+    .brand-note strong { display: block; font-size: 1.1rem; }
+    .brand-note span { color: #c8d6f0; }
+    .login-panel { width: min(100%, 530px); justify-self: end; }
+    .login-card { background: rgba(255,255,255,.97); border: 1px solid rgba(255,255,255,.85); border-radius: 28px; box-shadow: 0 30px 90px rgba(0,10,35,.46); padding: clamp(30px,4vw,52px) clamp(28px,3.8vw,48px) 34px; text-align: center; backdrop-filter: blur(12px); }
+    .card-logo-wrap { width: 220px; height: 150px; margin: 0 auto 24px; overflow: hidden; border-radius: 16px; background: #171640; }
+    .card-logo { width: 100%; height: 100%; object-fit: cover; object-position: center 40%; transform: scale(1.18); }
+    h1 { font-size: clamp(1.65rem,2vw,2rem); line-height: 1.15; margin: 0 0 8px; font-weight: 850; letter-spacing: -.03em; }
+    .subtitle { color: var(--muted); font-size: 1.08rem; margin: 0 0 32px; }
+    .field { text-align: left; margin-bottom: 22px; }
+    label { display: block; margin-bottom: 10px; font-weight: 750; }
+    .input-wrap { display: flex; align-items: center; min-height: 68px; background: #edf4ff; border: 1px solid #cfdcf0; border-radius: 15px; overflow: hidden; transition: .2s; }
+    .input-wrap:focus-within { border-color: #1b68d8; box-shadow: 0 0 0 4px rgba(27,104,216,.12); background: #f5f9ff; }
+    .input-wrap > i { width: 64px; font-size: 1.6rem; text-align: center; color: #09255c; }
+    input { flex: 1; min-width: 0; height: 66px; border: 0; outline: 0; background: transparent; color: #081c48; font: inherit; font-size: 1.08rem; font-weight: 650; padding: 0 14px 0 0; }
+    .toggle { width: 72px; align-self: stretch; border: 0; border-left: 1px solid #d4deed; background: rgba(255,255,255,.65); color: #667da8; font-size: 1.5rem; cursor: pointer; }
+    .submit { width: 100%; min-height: 68px; margin-top: 8px; border: 0; border-radius: 15px; color: white; background: linear-gradient(135deg,#06245c,#06367f); font: inherit; font-size: 1.14rem; font-weight: 800; cursor: pointer; box-shadow: 0 15px 28px rgba(4,43,105,.22); }
+    .submit:hover { background: linear-gradient(135deg,#073176,#08479f); transform: translateY(-1px); }
+    .submit:disabled { opacity: .7; cursor: wait; transform: none; }
+    .error { margin-top: 16px; padding: 12px 14px; border-radius: 10px; background: #fff0f0; border: 1px solid #ffc9c9; color: #a51d2d; text-align: left; font-weight: 650; }
+    .hidden { display: none; }
+    .footer { display: block; color: #7b8eb1; margin-top: 28px; font-size: .9rem; }
+    @media (max-width: 980px) { .login-shell { grid-template-columns: 1fr; justify-items: center; padding: 28px 18px; background: linear-gradient(rgba(1,11,35,.34),rgba(1,11,35,.6)); } .brand-stage { min-height: auto; width: 100%; } .brand-logo { width: min(330px,72vw); margin: 0 auto; } .brand-note { display: none; } .login-panel { justify-self: center; } }
+    @media (max-height: 780px) and (min-width: 561px) { .login-shell { padding-block: 18px; } .login-card { padding: 24px 38px 22px; border-radius: 22px; } .card-logo-wrap { width: 170px; height: 104px; margin-bottom: 14px; } h1 { font-size: 1.55rem; } .subtitle { margin-bottom: 18px; font-size: .96rem; } .field { margin-bottom: 14px; } label { margin-bottom: 6px; } .input-wrap, input { min-height: 54px; height: 54px; } .submit { min-height: 56px; } .footer { margin-top: 16px; } }
+    @media (max-width: 560px) { body { background-position: 36% center; } .login-shell { align-content: end; padding: 20px 12px; } .brand-stage { display: none; } .login-card { border-radius: 22px; padding: 24px 20px 26px; } .card-logo-wrap { width: 170px; height: 112px; margin-bottom: 18px; } .subtitle { margin-bottom: 22px; font-size: .95rem; } .input-wrap,input { min-height: 58px; height: 58px; } .submit { min-height: 58px; } }
+  </style>
+</head>
+<body>
+  <main class="login-shell">
+    <section class="brand-stage" aria-label="Sua Empresa Logistics"></section>
+    <section class="login-panel" aria-label="Login de veículos em preparação">
+      <div class="login-card">
+        <div class="card-logo-wrap"><img src="/images/logo-sua-empresa.png" alt="Sua Empresa Logistics" class="card-logo"></div>
+        <h1>Veículos em Preparação</h1>
+        <p class="subtitle">Acesso restrito ao checklist de preparação</p>
+        <form id="preparacaoLoginForm">
+          <div class="field"><label for="loginUsername">Usuário</label><div class="input-wrap"><i class="bi bi-person"></i><input type="text" id="loginUsername" autocomplete="username" value="admin" required></div></div>
+          <div class="field"><label for="loginPassword">Senha</label><div class="input-wrap"><i class="bi bi-lock"></i><input type="password" id="loginPassword" autocomplete="current-password" required><button class="toggle" type="button" id="togglePassword" title="Mostrar ou ocultar senha" aria-label="Mostrar senha"><i class="bi bi-eye" id="passwordIcon"></i></button></div></div>
+          <button class="submit" id="loginSubmit" type="submit"><i class="bi bi-box-arrow-in-right"></i> Entrar</button>
+          <div id="loginError" class="error hidden" role="alert"></div>
+        </form>
+        <small class="footer">Sistema de Controle de Pátio - Uso Interno</small>
+      </div>
+    </section>
+  </main>
+  <script>
+    async function fetchJson(url, options = {}) { const response = await fetch(url, { credentials: 'include', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options }); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`); return data; }
+    document.getElementById('togglePassword').addEventListener('click', () => { const input = document.getElementById('loginPassword'); const icon = document.getElementById('passwordIcon'); const show = input.type === 'password'; input.type = show ? 'text' : 'password'; icon.className = show ? 'bi bi-eye-slash' : 'bi bi-eye'; document.getElementById('togglePassword').setAttribute('aria-label', show ? 'Ocultar senha' : 'Mostrar senha'); });
+    document.getElementById('preparacaoLoginForm').addEventListener('submit', async event => { event.preventDefault(); const error = document.getElementById('loginError'); const submit = document.getElementById('loginSubmit'); error.classList.add('hidden'); submit.disabled = true; try { await fetchJson('/api/auth/login', { method: 'POST', body: JSON.stringify({ username: document.getElementById('loginUsername').value.trim(), password: document.getElementById('loginPassword').value, context: 'preparacao' }) }); window.location.href = '/frota'; } catch (err) { error.textContent = err.message || 'Não foi possível entrar.'; error.classList.remove('hidden'); } finally { submit.disabled = false; } });
+    fetchJson('/api/auth/me').then(auth => { if (auth.authenticated && auth.fleetPreparation?.canAccess) window.location.href = '/frota'; }).catch(() => {});
+  </script>
+</body>
+</html>

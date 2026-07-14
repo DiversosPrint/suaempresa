@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup — Conjunto montado</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #10233d;
+      --muted: #607189;
+      --line: #dce3ec;
+      --green: #16a34a;
+      --green-dark: #087a36;
+      --violet: #4d3df3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 38px 20px 56px;
+      color: var(--ink);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(90deg, rgba(3, 19, 48, .2), rgba(3, 19, 48, .07)),
+        url('images/login-sua-empresa.jpg') center top / cover fixed no-repeat,
+        #f4f7fb;
+    }
+    button { font: inherit; }
+    .page {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+    .mockup-note {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 14px 18px;
+      border: 1px solid rgba(255, 255, 255, .8);
+      border-radius: 14px;
+      color: #fff;
+      background: rgba(8, 26, 51, .78);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 14px 36px rgba(3, 19, 48, .18);
+    }
+    .mockup-note strong { display: block; font-size: 1rem; }
+    .mockup-note span { color: #dbe8f6; font-size: .85rem; }
+    .mockup-badge {
+      flex: 0 0 auto;
+      padding: 7px 11px;
+      border-radius: 999px;
+      color: #b7f7d0;
+      background: rgba(22, 163, 74, .22);
+      border: 1px solid rgba(183, 247, 208, .34);
+      font-size: .74rem;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .panel {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .97);
+      box-shadow: 0 18px 44px rgba(16, 35, 61, .13);
+    }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .panel-head h1 { margin: 0; font-size: 1.15rem; }
+    .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: .86rem; }
+    .view-switch {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 10px;
+      background: #edf2f7;
+    }
+    .view-switch button {
+      border: 0;
+      border-radius: 7px;
+      padding: 8px 12px;
+      color: #52657d;
+      background: transparent;
+      cursor: pointer;
+      font-size: .78rem;
+      font-weight: 900;
+    }
+    .view-switch button.active {
+      color: #fff;
+      background: #16823e;
+      box-shadow: 0 5px 12px rgba(22, 130, 62, .22);
+    }
+    .view { display: none; }
+    .view.active { display: block; }
+    .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .cards.single { grid-template-columns: minmax(0, 352px); justify-content: center; }
+    .vehicle-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 10px 22px rgba(16, 35, 61, .09);
+    }
+    .hero {
+      position: relative;
+      min-height: 174px;
+      overflow: hidden;
+      padding: 12px;
+      color: #fff;
+      background: linear-gradient(135deg, #087a36 0%, #1cbd61 100%);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -70px auto;
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .09);
+    }
+    .topline { position: relative; z-index: 4; display: flex; justify-content: space-between; gap: 10px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .92);
+      font-size: .78rem;
+      font-weight: 900;
+    }
+    .pill.status { color: #fff; background: rgba(255, 255, 255, .18); border: 1px solid rgba(255, 255, 255, .34); }
+    .set-label {
+      position: absolute;
+      z-index: 5;
+      top: 52px;
+      left: 12px;
+      padding: 5px 9px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, .18);
+      border: 1px solid rgba(255, 255, 255, .34);
+      font-size: .75rem;
+      font-weight: 950;
+      letter-spacing: .025em;
+    }
+    .plate-stack { position: absolute; z-index: 6; left: 12px; bottom: 14px; display: grid; gap: 5px; }
+    .plate-line { display: flex; align-items: center; gap: 7px; }
+    .plate-kind { width: 43px; color: rgba(255, 255, 255, .86); font-size: .62rem; font-weight: 900; text-transform: uppercase; }
+    .plate {
+      position: relative;
+      min-width: 112px;
+      padding: 9px 10px 5px;
+      border: 2px solid #183b77;
+      border-radius: 6px;
+      color: #c01820;
+      background: #fff;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, .18);
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-weight: 900;
+      letter-spacing: .06em;
+    }
+    .plate::before {
+      content: "BRASIL";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 7px;
+      color: #fff;
+      background: #164b91;
+      font-size: 5px;
+      line-height: 7px;
+      letter-spacing: .08em;
+    }
+    .set-image {
+      position: absolute;
+      z-index: 3;
+      right: -5px;
+      bottom: -5px;
+      width: 190px;
+      height: 132px;
+      object-fit: contain;
+      object-position: bottom right;
+      filter: drop-shadow(0 12px 12px rgba(11, 23, 43, .28));
+    }
+    .body { padding: 14px 16px 16px; }
+    .summary {
+      margin-bottom: 11px;
+      padding: 9px 10px;
+      border: 1px solid #d8e1ec;
+      border-radius: 8px;
+      background: #f8fafc;
+    }
+    .summary small { display: block; color: #53657d; font-size: .68rem; font-weight: 900; text-transform: uppercase; }
+    .summary strong { display: block; margin-top: 2px; font-size: .83rem; }
+    .meta { display: grid; grid-template-columns: 82px 1fr; gap: 8px; align-items: center; margin-bottom: 9px; font-size: .81rem; }
+    .meta span { color: #53657d; }
+    .meta strong { overflow: hidden; color: #020617; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .76rem; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+    .progress { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; margin: 12px 0 14px; }
+    .track { height: 8px; overflow: hidden; border-radius: 999px; background: #e8edf3; }
+    .fill { width: 100%; height: 100%; border-radius: inherit; background: #18a957; }
+    .progress strong { color: #020617; font-size: .86rem; }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+    .chip { padding: 5px 8px; border: 1px solid #a9efc4; border-radius: 7px; color: #167342; background: #d9fbe6; font-size: .74rem; font-weight: 900; }
+    .actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .open, .separate {
+      min-height: 42px;
+      border: 1px solid #d8e1ec;
+      border-radius: 9px;
+      background: #f8fafc;
+      cursor: pointer;
+      font-weight: 900;
+    }
+    .open { color: var(--violet); }
+    .separate { width: 44px; color: #087a36; background: #effcf4; border-color: #afe8c5; }
+    .compact .hero { min-height: 148px; }
+    .compact .set-label { max-width: 165px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .compact .set-image { width: 142px; height: 94px; }
+    .compact .plate-stack { bottom: 16px; }
+    .compact .plate-kind { display: none; }
+    .compact .plate-line + .plate-line { display: none; }
+    .hint {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 16px;
+      padding: 11px 13px;
+      border-radius: 10px;
+      color: #36526f;
+      background: #eef6ff;
+      border: 1px solid #d1e7ff;
+      font-size: .8rem;
+    }
+    @media (max-width: 760px) {
+      body { padding: 18px 10px 34px; }
+      .mockup-note, .panel-head { align-items: flex-start; flex-direction: column; }
+      .panel { padding: 14px; }
+      .cards { grid-template-columns: 1fr; }
+      .view-switch { width: 100%; }
+      .view-switch button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="mockup-note">
+      <div>
+        <strong>Prévia visual — módulo Preparação</strong>
+        <span>Demonstração isolada, sem alteração nos veículos ou checklists.</span>
+      </div>
+      <span class="mockup-badge">Mockup</span>
+    </div>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h1>Veículos prontos para operar</h1>
+          <p>O cavalo e a carreta passam a ocupar um único espaço na grade.</p>
+        </div>
+        <div class="view-switch" aria-label="Alternar visualização">
+          <button type="button" class="active" data-view="together">Conjunto montado</button>
+          <button type="button" data-view="separate">Visualizar separadamente</button>
+        </div>
+      </div>
+
+      <div class="view active" id="view-together">
+        <div class="cards single">
+          <article class="vehicle-card">
+            <div class="hero">
+              <div class="topline">
+                <span class="pill"><i class="bi bi-check2"></i>18 dias</span>
+                <span class="pill status">Pronto</span>
+              </div>
+              <div class="set-label">CONJUNTO MONTADO</div>
+              <div class="plate-stack">
+                <div class="plate-line"><span class="plate-kind">Cavalo</span><span class="plate">UOQ0F42</span></div>
+                <div class="plate-line"><span class="plate-kind">Carreta</span><span class="plate">TJS0E39</span></div>
+              </div>
+              <img class="set-image" src="images/conjunto.png" alt="Cavalo e carreta formando um conjunto">
+            </div>
+            <div class="body">
+              <div class="summary"><small>Estágio da preparação</small><strong>Conjunto pronto para operar</strong></div>
+              <div class="meta"><span>Próximo</span><strong>Checklist concluído</strong></div>
+              <div class="meta"><span>Cavalo</span><strong>UOQ0F42 · AXOR 2038S/36</strong></div>
+              <div class="meta"><span>Carreta</span><strong>TJS0E39 · Facchini</strong></div>
+              <div class="meta"><span>Frota</span><strong>Cavalo N/I · Carreta 1467</strong></div>
+              <div class="meta"><span>Operação</span><strong>Padrão + Diversos</strong></div>
+              <div class="meta"><span>Pátio</span><strong>Não informado</strong></div>
+              <div class="meta"><span>Status</span><strong>Conjunto montado</strong></div>
+              <div class="progress"><div class="track"><div class="fill"></div></div><strong>100%</strong></div>
+              <div class="chips">
+                <span class="chip">DOC 10/10</span><span class="chip">FRO 6/6</span><span class="chip">EST 3/3</span>
+                <span class="chip">MAN 4/4</span><span class="chip">TEC 1/1</span><span class="chip">UPG 3/3</span>
+              </div>
+              <div class="actions">
+                <button type="button" class="open">Abrir conjunto →</button>
+                <button type="button" class="separate" title="Visualizar veículos separadamente" data-show-separate><i class="bi bi-layout-split"></i></button>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="hint"><i class="bi bi-info-circle"></i> Ao abrir o conjunto, o usuário poderá alternar para os dois cards originais sem desfazer a associação.</div>
+      </div>
+
+      <div class="view" id="view-separate">
+        <div class="cards">
+          <article class="vehicle-card compact">
+            <div class="hero">
+              <div class="topline"><span class="pill"><i class="bi bi-check2"></i>18 dias</span><span class="pill status">Pronto</span></div>
+              <div class="set-label">Cavalo AXOR 2038S/36</div>
+              <div class="plate-stack"><div class="plate-line"><span class="plate">UOQ0F42</span></div></div>
+              <img class="set-image" src="images/frota-modelos/AXOR-2038S.png" alt="Cavalo AXOR">
+            </div>
+            <div class="body">
+              <div class="summary"><small>Estágio da preparação</small><strong>Pronto para operar</strong></div>
+              <div class="meta"><span>Modelo</span><strong>AXOR 2038S/36 4X2</strong></div>
+              <div class="meta"><span>Chassi</span><strong>462252</strong></div>
+              <div class="meta"><span>RENAVAM</span><strong>01498132348</strong></div>
+              <div class="progress"><div class="track"><div class="fill"></div></div><strong>100%</strong></div>
+              <div class="chips"><span class="chip">DOC 10/10</span><span class="chip">FRO 6/6</span><span class="chip">EST 3/3</span><span class="chip">MAN 4/4</span><span class="chip">TEC 1/1</span><span class="chip">UPG 3/3</span></div>
+              <button type="button" class="open">Abrir checklist →</button>
+            </div>
+          </article>
+
+          <article class="vehicle-card compact">
+            <div class="hero">
+              <div class="topline"><span class="pill"><i class="bi bi-check2"></i>12 dias</span><span class="pill status">Diversos</span></div>
+              <div class="set-label">Carreta</div>
+              <div class="plate-stack"><div class="plate-line"><span class="plate">TJS0E39</span></div></div>
+              <img class="set-image" src="images/frota-modelos/Facchini.png" alt="Carreta Facchini">
+            </div>
+            <div class="body">
+              <div class="summary"><small>Estágio da preparação</small><strong>Pronto para operar</strong></div>
+              <div class="meta"><span>Modelo</span><strong>Facchini</strong></div>
+              <div class="meta"><span>Frota</span><strong>1467</strong></div>
+              <div class="meta"><span>Chassi</span><strong>088713</strong></div>
+              <div class="progress"><div class="track"><div class="fill"></div></div><strong>100%</strong></div>
+              <div class="chips"><span class="chip">DOC 10/10</span><span class="chip">FRO 6/6</span><span class="chip">EST 3/3</span><span class="chip">MAN 4/4</span><span class="chip">TEC 1/1</span><span class="chip">UPG 3/3</span></div>
+              <button type="button" class="open">Abrir checklist →</button>
+            </div>
+          </article>
+        </div>
+        <div class="hint"><i class="bi bi-arrow-left-right"></i> Esta visualização mantém os cards como estão hoje; é apenas uma forma de consulta individual.</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const buttons = document.querySelectorAll('[data-view]');
+    function showView(name) {
+      document.querySelectorAll('.view').forEach(view => view.classList.toggle('active', view.id === `view-${name}`));
+      buttons.forEach(button => button.classList.toggle('active', button.dataset.view === name));
+    }
+    buttons.forEach(button => button.addEventListener('click', () => showView(button.dataset.view)));
+    document.querySelector('[data-show-separate]').addEventListener('click', () => showView('separate'));
+  </script>
+</body>
+</html>

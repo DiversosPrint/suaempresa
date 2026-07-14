@@ -1,0 +1,435 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seminovos - Sua Empresa</title>
+<link rel="icon" href="/images/logo-sua-empresa.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="/css/seminovos.css">
+</head>
+<body>
+<div id="toastContainer" class="toast-wrap"></div>
+
+<div id="seminovosLoginScreen" class="login-screen">
+  <div class="login-card text-center">
+    <img src="/images/logo-sua-empresa.png" alt="Sua Empresa Logistics" class="login-logo">
+    <h1 class="login-title h3 mb-2">Seminovos - Sua Empresa</h1>
+    <p class="login-subtitle mb-4">Sua Empresa Logistics</p>
+    <form id="seminovosLoginForm">
+      <div class="mb-3 text-start">
+        <label class="form-label" for="seminovosLoginUsername">Usuário</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-person"></i></span>
+          <input type="text" class="form-control form-control-lg" id="seminovosLoginUsername" placeholder="Usuário" required autocomplete="username">
+        </div>
+      </div>
+      <div class="mb-3 text-start">
+        <label class="form-label" for="seminovosLoginPassword">Senha</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input type="password" class="form-control form-control-lg" id="seminovosLoginPassword" placeholder="Senha" required autocomplete="current-password">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-lg w-100 seminovos-primary-btn">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+      </button>
+    </form>
+    <div id="seminovosLoginError" class="alert alert-danger mt-3 hidden"></div>
+    <div class="small text-muted mt-4">
+      <i class="bi bi-shield-lock me-1"></i>Acesso restrito ao módulo Seminovos
+    </div>
+  </div>
+</div>
+
+<div id="seminovosApp" class="app-shell hidden">
+  <header class="seminovos-header">
+    <div class="header-inner container-fluid">
+      <div class="brand-block">
+        <img src="/images/logo-sua-empresa.png" alt="Sua Empresa Logistics">
+        <div>
+          <p class="brand-title">Seminovos - Sua Empresa</p>
+          <div class="brand-subtitle">Cadastro, ordens de serviço, peças e acompanhamento operacional</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-outline-light btn-sm hidden" id="btnBackToPatio" type="button">
+          <i class="bi bi-arrow-left-circle me-1"></i>Controle de Pátio
+        </button>
+        <div class="user-chip">
+          <div class="user-avatar" id="seminovosUserAvatar">S</div>
+          <div>
+            <div class="fw-bold" id="seminovosUserName">Seminovos</div>
+            <div class="role-badge" id="seminovosUserRole">SEMINOVOS</div>
+          </div>
+        </div>
+        <button class="btn btn-light btn-sm" type="button" id="btnSeminovosLogout">
+          <i class="bi bi-box-arrow-right me-1"></i>Sair
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content container-fluid">
+    <section class="hero-banner">
+      <h2 class="h3">Aqui o nosso seminovo faz a diferença.</h2>
+    </section>
+
+    <nav class="module-nav" aria-label="Navegação do módulo">
+      <button class="nav-btn active" type="button" data-view="painel"><i class="bi bi-speedometer2 me-1"></i>Painel</button>
+      <button class="nav-btn" type="button" data-view="veiculos"><i class="bi bi-truck-front me-1"></i>Veículos</button>
+      <button class="nav-btn" type="button" data-view="ordens"><i class="bi bi-tools me-1"></i>Ordens de Serviço</button>
+      <button class="nav-btn" type="button" data-view="pecas"><i class="bi bi-box-seam me-1"></i>Peças Utilizadas</button>
+    </nav>
+
+    <section id="painelView" class="module-view">
+      <div id="seminovosDashboardCards" class="panel-grid"></div>
+      <div class="row g-3">
+        <div class="col-lg-7">
+          <div class="surface-card h-100">
+            <div class="section-title">
+              <h5 class="mb-0"><i class="bi bi-exclamation-circle me-2"></i>Veículos com atenção</h5>
+            </div>
+            <div id="seminovosAttentionList"></div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="surface-card h-100">
+            <div class="section-title">
+              <h5 class="mb-0"><i class="bi bi-clipboard2-pulse me-2"></i>Ordens em aberto</h5>
+            </div>
+            <div id="seminovosOpenOrdersList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="veiculosView" class="module-view hidden">
+      <div class="action-bar">
+        <div>
+          <h5 class="mb-1">Veículos Seminovos</h5>
+          <small class="text-muted">Cadastro com situação operacional, situação comercial e fotos otimizadas.</small>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-warning" type="button" id="btnNovoVeiculoSeminovos">
+            <i class="bi bi-plus-circle me-1"></i>Novo veículo
+          </button>
+          <button class="btn btn-outline-primary" type="button" id="btnSeminovosExportPdfAll">
+            <i class="bi bi-file-earmark-pdf me-1"></i>Exportar PDF completo
+          </button>
+          <button class="btn btn-outline-success" type="button" id="btnSeminovosExportJson">
+            <i class="bi bi-file-earmark-json me-1"></i>Exportar JSON
+          </button>
+          <button class="btn btn-outline-info" type="button" id="btnSeminovosImportJson">
+            <i class="bi bi-file-earmark-arrow-up me-1"></i>Importar JSON
+          </button>
+          <input type="file" id="seminovosImportJsonFile" accept=".json" class="hidden">
+        </div>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-group">
+          <input type="search" class="form-control" id="seminovosVehicleSearch" placeholder="Buscar por placa, chassi ou observação">
+          <select class="form-select" id="seminovosVehicleYardFilter"></select>
+          <select class="form-select" id="seminovosVehicleTypeFilter"></select>
+          <select class="form-select" id="seminovosVehicleStatusFilter"></select>
+          <select class="form-select" id="seminovosVehicleCommercialFilter"></select>
+          <select class="form-select" id="seminovosVehicleSoldFilter">
+            <option value="">Venda: todos</option>
+            <option value="true">Vendidos</option>
+            <option value="false">Não vendidos</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Placa</th>
+                <th>Pátio</th>
+                <th>Tipo</th>
+                <th>Odômetro</th>
+                <th>Situação do veículo</th>
+                <th>Situação comercial</th>
+                <th>Vendido</th>
+                <th>Última OS</th>
+                <th>Fotos</th>
+                <th>Atualizado</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="seminovosVehiclesTableBody"></tbody>
+          </table>
+        </div>
+        <div id="seminovosVehiclesEmptyState" class="empty-state hidden">
+          <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+          Nenhum veículo seminovo encontrado para os filtros atuais.
+        </div>
+      </div>
+    </section>
+
+    <section id="ordensView" class="module-view hidden">
+      <div class="action-bar">
+        <div>
+          <h5 class="mb-1">Ordens de Serviço</h5>
+          <small class="text-muted">Acompanhe a OS, categoria, peças utilizadas e histórico do atendimento.</small>
+        </div>
+        <button class="btn btn-warning" type="button" id="btnNovaOSSeminovos">
+          <i class="bi bi-wrench-adjustable-circle me-1"></i>Nova OS
+        </button>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-group">
+          <input type="search" class="form-control" id="seminovosOrderSearch" placeholder="Buscar por placa, nº da OS ou descrição">
+          <select class="form-select" id="seminovosOrderCategoryFilter"></select>
+          <select class="form-select" id="seminovosOrderStatusFilter"></select>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Nº da OS</th>
+                <th>Veículo</th>
+                <th>Categoria</th>
+                <th>Situação</th>
+                <th>Odômetro</th>
+                <th>Abertura</th>
+                <th>Fechamento</th>
+                <th>Peças</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="seminovosOrdersTableBody"></tbody>
+          </table>
+        </div>
+        <div id="seminovosOrdersEmptyState" class="empty-state hidden">
+          <i class="bi bi-tools fs-2 d-block mb-2"></i>
+          Nenhuma ordem de serviço encontrada para os filtros atuais.
+        </div>
+      </div>
+    </section>
+
+    <section id="pecasView" class="module-view hidden">
+      <div class="action-bar">
+        <div>
+          <h5 class="mb-1">Relatório de Peças Utilizadas</h5>
+          <small class="text-muted">Consulta consolidada por veículo, ordem de serviço e categoria.</small>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <div class="filter-group">
+          <input type="search" class="form-control" id="seminovosPartsSearch" placeholder="Buscar por placa, peça ou nº da OS">
+        </div>
+      </div>
+      <div id="seminovosPartsSummary" class="panel-grid"></div>
+      <div class="table-card mt-3">
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Veículo</th>
+                <th>Nº da OS</th>
+                <th>Categoria</th>
+                <th>Peça</th>
+                <th>Quantidade</th>
+                <th>Observação</th>
+                <th>Registrado em</th>
+              </tr>
+            </thead>
+            <tbody id="seminovosPartsTableBody"></tbody>
+          </table>
+        </div>
+        <div id="seminovosPartsEmptyState" class="empty-state hidden">
+          <i class="bi bi-box-seam fs-2 d-block mb-2"></i>
+          Nenhuma peça utilizada encontrada para os filtros atuais.
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal fade" id="seminovosVehicleModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-truck-front me-2"></i><span id="seminovosVehicleModalTitle">Novo veículo seminovo</span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <form id="seminovosVehicleForm">
+        <div class="modal-body">
+          <input type="hidden" id="seminovosVehicleId">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosVehiclePlate">Placa</label>
+              <input type="text" class="form-control" id="seminovosVehiclePlate" placeholder="ABC1D23" maxlength="8" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosVehicleType">Tipo</label>
+              <select class="form-select" id="seminovosVehicleType" required></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosVehicleYard">Pátio</label>
+              <select class="form-select" id="seminovosVehicleYard" required></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosVehicleOdometer">Odômetro</label>
+              <input type="number" class="form-control" id="seminovosVehicleOdometer" min="0" step="1" placeholder="0">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosVehicleChassis">Chassi</label>
+              <input type="text" class="form-control" id="seminovosVehicleChassis" placeholder="Chassi do veículo">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosVehicleOperationalStatus">Situação do veículo</label>
+              <select class="form-select" id="seminovosVehicleOperationalStatus"></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosVehicleCommercialStatus">Pós-venda / Garantia</label>
+              <select class="form-select" id="seminovosVehicleCommercialStatus"></select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" role="switch" id="seminovosVehicleSold">
+                <label class="form-check-label fw-semibold" for="seminovosVehicleSold">Veículo vendido</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="seminovosVehicleNotes">Observações gerais</label>
+              <textarea class="form-control" id="seminovosVehicleNotes" rows="3" placeholder="Pendências, histórico resumido, observações comerciais ou operacionais..."></textarea>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <div class="section-title">
+            <div>
+              <h6 class="mb-1">Fotos do veículo</h6>
+              <small class="text-muted">Máximo de uma foto por categoria. As imagens são reduzidas antes do envio para economizar espaço.</small>
+            </div>
+          </div>
+          <div id="seminovosVehiclePhotoFields" class="photo-grid"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Salvar veículo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="seminovosOrderModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-tools me-2"></i><span id="seminovosOrderModalTitle">Nova ordem de serviço</span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <form id="seminovosOrderForm">
+        <div class="modal-body">
+          <input type="hidden" id="seminovosOrderId">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosOrderVehicleId">Veículo</label>
+              <select class="form-select" id="seminovosOrderVehicleId" required></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosOrderNumber">Nº da ordem de serviço</label>
+              <input type="text" class="form-control" id="seminovosOrderNumber" placeholder="Ex.: 458712" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosOrderOdometer">Odômetro na abertura</label>
+              <input type="number" class="form-control" id="seminovosOrderOdometer" min="0" step="1">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosOrderCategory">Categoria</label>
+              <select class="form-select" id="seminovosOrderCategory"></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosOrderStatus">Situação da ordem</label>
+              <select class="form-select" id="seminovosOrderStatus"></select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosOrderOpenedAt">Data de abertura</label>
+              <input type="datetime-local" class="form-control" id="seminovosOrderOpenedAt">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="seminovosOrderClosedAt">Data de encerramento</label>
+              <input type="datetime-local" class="form-control" id="seminovosOrderClosedAt">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label" for="seminovosOrderDescription">Descrição do serviço</label>
+              <textarea class="form-control" id="seminovosOrderDescription" rows="2" placeholder="Resumo do problema, atividade executada ou escopo da OS"></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="seminovosOrderNotes">Observações</label>
+              <textarea class="form-control" id="seminovosOrderNotes" rows="2" placeholder="Detalhes adicionais, terceiros envolvidos, retorno do cliente, etc."></textarea>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <div class="section-title">
+            <div>
+              <h6 class="mb-1">Peças utilizadas</h6>
+              <small class="text-muted">Registre as peças usadas nesta ordem de serviço.</small>
+            </div>
+            <button type="button" class="btn btn-outline-warning btn-sm" id="btnAddSeminovosPart">
+              <i class="bi bi-plus-circle me-1"></i>Adicionar peça
+            </button>
+          </div>
+          <div id="seminovosOrderPartsContainer" class="parts-list"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-warning"><i class="bi bi-save me-1"></i>Salvar OS</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="seminovosVehicleDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-file-earmark-text me-2"></i>Ficha do veículo seminovo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body" id="seminovosVehicleDetailsContent"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" id="btnEditSeminovosVehicleDetails">
+          <i class="bi bi-pencil me-1"></i>Editar veículo
+        </button>
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade seminovos-image-modal" id="seminovosImageViewerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl modal-fullscreen-md-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title"><i class="bi bi-arrows-fullscreen me-2"></i><span id="seminovosImageViewerTitle">Foto do veículo</span></h5>
+          <small class="text-white-50" id="seminovosImageViewerMeta">Toque fora da imagem para fechar.</small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="seminovos-image-viewer-stage">
+          <img id="seminovosImageViewerImage" src="" alt="Foto ampliada do veículo">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/seminovos.js"></script>
+</body>
+</html>

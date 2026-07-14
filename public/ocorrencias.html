@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Ocorrências</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root {
+    --brand: #133b63;
+    --brand-soft: #e8f0f7;
+    --accent: #ff7a18;
+}
+body {
+    background:
+        radial-gradient(circle at top left, rgba(19, 59, 99, 0.12), transparent 28%),
+        linear-gradient(180deg, #f7fafc 0%, #eef3f7 100%);
+    min-height: 100vh;
+}
+.page-shell {
+    max-width: 1380px;
+}
+.hero {
+    background: linear-gradient(135deg, #133b63 0%, #225c90 55%, #2f7ab9 100%);
+    color: #fff;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 24px 48px rgba(19, 59, 99, 0.22);
+}
+.panel {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(19, 59, 99, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 18px 30px rgba(15, 23, 42, 0.08);
+}
+.table thead th {
+    background: var(--brand);
+    color: #fff;
+    white-space: nowrap;
+}
+.badge-soft {
+    background: var(--brand-soft);
+    color: var(--brand);
+}
+</style>
+</head>
+<body>
+<main class="container py-4 py-lg-5 page-shell">
+    <section class="hero mb-4">
+        <div>
+            <h1 class="h2 mb-0">Sistema de Ocorrências</h1>
+        </div>
+    </section>
+
+    <div id="alertHost" class="mb-3"></div>
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-4">
+            <section class="panel p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2 class="h4 mb-1" id="formTitle">Nova ocorrência</h2>
+                        <p class="text-secondary mb-0">Preencha os campos e salve no banco.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-info btn-sm" id="basesBtn" type="button">Cadastros</button>
+                        <button class="btn btn-outline-secondary btn-sm" id="resetBtn" type="button">Limpar</button>
+                    </div>
+                </div>
+
+                <form id="occurrenceForm" class="row g-3">
+                    <input type="hidden" id="occurrenceId">
+
+                    <div class="col-12">
+                        <label class="form-label" for="tripNumber">Número da Viagem</label>
+                        <input class="form-control" id="tripNumber" type="number" min="1" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="tripDate">Data da Viagem</label>
+                        <input class="form-control" id="tripDate" type="date" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="branch">Base</label>
+                        <select class="form-select" id="branch"></select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="tripType">Tipo da Viagem</label>
+                        <select class="form-select" id="tripType"></select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="line">Linha</label>
+                        <select class="form-select" id="line"></select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="plate">Placa</label>
+                        <select class="form-select" id="plate"></select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="vehicleType">Tipo do Veículo</label>
+                        <select class="form-select" id="vehicleType"></select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="reason">Motivo</label>
+                        <select class="form-select" id="reason"></select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="subcategory">Subcategoria</label>
+                        <select class="form-select" id="subcategory"></select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="detail">Detalhamento</label>
+                        <select class="form-select" id="detail"></select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="serviceOrder">Ordem de Serviço</label>
+                        <input class="form-control" id="serviceOrder" type="text">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label" for="observation">Observação</label>
+                        <textarea class="form-control" id="observation" rows="3"></textarea>
+                    </div>
+
+                    <div class="col-12 d-flex gap-2">
+                        <button class="btn btn-primary flex-grow-1" type="submit" id="submitBtn">Salvar ocorrência</button>
+                        <button class="btn btn-outline-dark" type="button" id="cancelEditBtn" hidden>Cancelar edição</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <div class="col-12 col-xl-8">
+            <section class="panel p-4">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+                    <div>
+                        <h2 class="h4 mb-1">Ocorrências cadastradas</h2>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-success" id="exportCsvBtn" type="button">Exportar CSV</button>
+                        <input class="form-control" id="searchInput" placeholder="Buscar por viagem, placa, base ou motivo">
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label" for="filterDateFrom">Data inicial</label>
+                        <input class="form-control" id="filterDateFrom" type="date">
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label" for="filterDateTo">Data final</label>
+                        <input class="form-control" id="filterDateTo" type="date">
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label" for="filterBranch">Base</label>
+                        <select class="form-select" id="filterBranch"></select>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label" for="filterReason">Motivo</label>
+                        <select class="form-select" id="filterReason"></select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="occurrencesTable">
+                        <thead>
+                            <tr>
+                                <th>Viagem</th>
+                                <th>Data</th>
+                                <th>Base</th>
+                                <th>Tipo</th>
+                                <th>Linha</th>
+                                <th>Placa</th>
+                                <th>Veículo</th>
+                                <th>Motivo</th>
+                                <th>Subcategoria</th>
+                                <th>Detalhamento</th>
+                                <th>OS</th>
+                                <th>Observação</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="occurrencesBody">
+                            <tr><td colspan="13" class="text-center py-4 text-secondary">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<script src="/js/ocorrencias.js"></script>
+</body>
+</html>

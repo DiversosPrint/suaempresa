@@ -1,0 +1,42 @@
+{
+  "name": "controle-patio-sua-empresa",
+  "version": "5.4.0",
+  "description": "Sistema de Controle de Pátio - Sua Empresa. Desenvolvido e mantido por Ramalho Sistemas e Software.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "catalog:import": "node scripts/import-vehicle-catalog-xls.js",
+    "backup:inspect": "node scripts/inspect-backups.js",
+    "backup:list": "node scripts/list-safety-snapshots.js",
+    "backup:snapshot": "node scripts/create-safety-snapshot.js",
+    "demo:reset": "node scripts/reset-demo-sua-empresa.js",
+    "backup:restore": "node scripts/restore-safety-snapshot.js"
+  },
+  "keywords": [
+    "controle-patio",
+    "transportadora",
+    "frota",
+    "sua-empresa",
+    "ramalho-sistemas"
+  ],
+  "author": "Ramalho Sistemas e Software",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^9.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-session": "^1.17.3",
+    "helmet": "^7.1.0",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

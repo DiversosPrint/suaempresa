@@ -1,0 +1,60 @@
+# Dependências
+node_modules/
+npm-debug.log*
+
+# Banco de dados local (SQLite)
+database/patio.db
+database/*.db-shm
+database/*.db-wal
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build/Output
+dist/
+build/
+public/dist/
+
+# Snapshots de seguranÃ§a gerados localmente
+backups/snapshots/
+
+# Limpeza local / arquivos gerados fora do runtime
+outputs/
+tmp/
+tmp*.js
+tmp*.patch
+backups/
+*_backup/
+*.bak
+design-mockups/
+assets/
+_publish_master/
+github-upload-autopreenchimento/
+public/index-atualizado.html
+public/tela-prontos-preview.html
+public/images/icone.png
+public/images/Login exemplo.jpg
+index-ptbr*.html
+index.txt
+server-ptbr*.js
+server-atualizado.js
+server.txt
+clean-front.ps1
+fix-encoding.ps1
+fix-server-encoding.ps1
