@@ -1,7 +1,7 @@
 ﻿// Service Worker - Controle de Patio Print
 // Desenvolvido por Ramalho Sistemas e Software
 
-const CACHE_NAME = 'patio-sua-empresa-v2-demo-5-cache';
+const CACHE_NAME = 'patio-sua-empresa-v3-app-icon-cache';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -12,8 +12,7 @@ const STATIC_ASSETS = [
   '/images/logo-sua-empresa.png',
   '/images/logo-sua-empresa-transparente.png',
   '/images/login-sua-empresa.jpg',
-  '/images/icon-192.png',
-  '/images/icon-512.png',
+  '/images/logo-sua-empresa.jpg',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css',
   'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
