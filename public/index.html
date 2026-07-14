@@ -45,9 +45,10 @@
 --dashboard-shadow: 0 20px 40px rgba(7, 13, 28, 0.2);
 }
 body {
+min-height: 100vh;
 background:
-radial-gradient(circle at top left, rgba(99,102,241,0.12), transparent 28%),
-radial-gradient(circle at top right, rgba(34,197,94,0.09), transparent 24%),
+linear-gradient(90deg, rgba(3, 19, 48, 0.18), rgba(3, 19, 48, 0.06)),
+url("/images/login-sua-empresa.jpg") center top / cover fixed no-repeat,
 var(--app-bg);
 color: var(--app-text);
 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -1310,9 +1311,9 @@ background: rgba(255,255,255,0.12);
 #mainApp {
 min-height: 100vh;
 background:
-radial-gradient(circle at 4% 0%, rgba(13,95,212,.11), transparent 30%),
-radial-gradient(circle at 96% 12%, rgba(255,157,0,.10), transparent 24%),
-linear-gradient(180deg, #eef4fb 0%, #f8fafc 46%, #edf3f9 100%);
+linear-gradient(180deg, rgba(238, 244, 251, 0.30) 0%, rgba(248, 250, 252, 0.30) 46%, rgba(237, 243, 249, 0.30) 100%),
+url("/images/login-sua-empresa.jpg") center top / cover fixed no-repeat,
+#edf3f9;
 }
 #mainApp > .container-fluid { max-width: 1880px; margin-inline: auto; }
 .header-print {
