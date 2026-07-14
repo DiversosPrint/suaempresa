@@ -2831,8 +2831,8 @@ Nenhum veículo com mais de 24h no pátio neste momento.
 <div class="d-flex align-items-center">
 <i class="bi bi-download fs-4 me-3"></i>
 <div class="flex-grow-1">
-<strong>Instalar Controle de Pátio?</strong>
-<p class="mb-0 small">Adicione à tela inicial para acesso rápido</p>
+<strong id="installPromptTitle">Instalar Controle de Pátio?</strong>
+<p class="mb-0 small" id="installPromptText">Adicione à tela inicial para acesso rápido</p>
 </div>
 <button class="btn btn-sm btn-primary ms-2" id="btnInstall">Instalar</button>
 <button class="btn btn-sm btn-outline-secondary ms-1" id="btnDismiss">✕</button>
@@ -3806,19 +3806,34 @@ function setupInstallPrompt() {
 const installPrompt = document.getElementById('installPrompt');
 const btnInstall = document.getElementById('btnInstall');
 const btnDismiss = document.getElementById('btnDismiss');
+const installPromptText = document.getElementById('installPromptText');
+const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+const showInstallBanner = () => {
+if (!isStandalone() && sessionStorage.getItem('pwa-install-dismissed-session') !== 'true') {
+installPrompt.classList.remove('d-none');
+}
+};
+
+localStorage.removeItem('pwa-install-dismissed');
 
 window.addEventListener('beforeinstallprompt', (e) => {
 e.preventDefault();
 deferredPrompt = e;
-setTimeout(() => {
-if (!localStorage.getItem('pwa-install-dismissed')) {
-installPrompt.classList.remove('d-none');
-}
-}, 3000);
+showInstallBanner();
 });
 
+window.addEventListener('load', () => setTimeout(showInstallBanner, 2500));
+
 btnInstall?.addEventListener('click', async () => {
-if (!deferredPrompt) return;
+if (!deferredPrompt) {
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const guidance = isIOS
+? 'No iPhone/iPad, toque em Compartilhar e depois em Adicionar à Tela de Início.'
+: 'No Chrome, abra o menu do navegador e escolha Instalar aplicativo ou Adicionar à tela inicial.';
+if (installPromptText) installPromptText.textContent = guidance;
+showToast(guidance, 'info');
+return;
+}
 deferredPrompt.prompt();
 const { outcome } = await deferredPrompt.userChoice;
 deferredPrompt = null;
@@ -3830,12 +3845,12 @@ showToast('ðŸŽ‰ App instalado com sucesso!', 'success');
 
 btnDismiss?.addEventListener('click', () => {
 installPrompt.classList.add('d-none');
-localStorage.setItem('pwa-install-dismissed', 'true');
+sessionStorage.setItem('pwa-install-dismissed-session', 'true');
 });
 
 window.addEventListener('appinstalled', () => {
 installPrompt.classList.add('d-none');
-localStorage.removeItem('pwa-install-dismissed');
+sessionStorage.removeItem('pwa-install-dismissed-session');
 });
 }
 
